@@ -354,7 +354,14 @@ TIME_GRAIN_ADDON_FUNCTIONS: Dict[str, Dict[str, str]] = {}
 
 # ---------------------------------------------------
 # List of viz_types not allowed in your environment
-# For example: Blacklist pivot table and treemap:
+# For example: Blacklist pivot table and tree
+
+
+
+
+
+
+:
 #  VIZ_TYPE_BLACKLIST = ['pivot_table', 'treemap']
 # ---------------------------------------------------
 
@@ -416,7 +423,7 @@ BACKUP_COUNT = 30
 QUERY_LOGGER = None
 
 # Set this API key to enable Mapbox visualizations
-MAPBOX_API_KEY = os.environ.get("MAPBOX_API_KEY", "")
+MAPBOX_API_KEY = 'pk.eyJ1Ijoic2hhZ3VuY291dHVyZSIsImEiOiJjazVjaDBwM2ExaGo4M21tdXhtMjA1aW1nIn0.7pcCRC-iFs4nAWRw978vTg'
 
 # Maximum number of rows returned from a database
 # in async mode, no more than SQL_MAX_ROW will be returned and stored
