@@ -32,11 +32,13 @@ from typing import Any, Callable, Dict, List, Optional
 
 from celery.schedules import crontab
 from dateutil import tz
-from flask_appbuilder.security.manager import AUTH_DB
+from flask_appbuilder.security.manager import AUTH_DB, AUTH_LDAP
 
 from superset.stats_logger import DummyStatsLogger
 from superset.utils.log import DBEventLogger
 from superset.utils.logging_configurator import DefaultLoggingConfigurator
+
+import configparser as CP
 
 # Realtime stats logger, a StatsD implementation exists
 STATS_LOGGER = DummyStatsLogger()
@@ -126,8 +128,8 @@ SECRET_KEY = (
 )
 
 # The SQLAlchemy connection string.
-SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(DATA_DIR, "superset.db")
-# SQLALCHEMY_DATABASE_URI = 'mysql://myapp@localhost/myapp'
+# SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(DATA_DIR, "superset.db")
+SQLALCHEMY_DATABASE_URI = 'mysql://couture:couture@mysql:3306/couture'
 # SQLALCHEMY_DATABASE_URI = 'postgresql://root:password@localhost/myapp'
 
 # In order to hook up a custom password store for all SQLACHEMY connections
@@ -205,7 +207,7 @@ DRUID_IS_ACTIVE = False
 # AUTH_DB : Is for database (username/password)
 # AUTH_LDAP : Is for LDAP
 # AUTH_REMOTE_USER : Is for using REMOTE_USER from web server
-AUTH_TYPE = AUTH_DB
+# AUTH_TYPE = AUTH_DB
 
 # Uncomment to setup Full admin role name
 # AUTH_ROLE_ADMIN = 'Admin'
@@ -220,6 +222,41 @@ AUTH_TYPE = AUTH_DB
 # AUTH_USER_REGISTRATION_ROLE = "Public"
 
 # When using LDAP Auth, setup the LDAP server
+AIRFLOW_HOME = os.environ["AIRFLOW_HOME"]
+ldap_conf_path = AIRFLOW_HOME + '/ldap.conf'
+config = CP.ConfigParser()
+config.optionxform = str
+config.read(filenames=ldap_conf_path)
+AUTH_TYPE = config.get('ldap', 'AUTH_TYPE')
+if AUTH_TYPE == 'AUTH_LDAP':
+    AUTH_ROLE_PUBLIC = config.get('ldap', 'AUTH_ROLE_PUBLIC')
+    AUTH_USER_REGISTRATION = config.get('ldap', 'AUTH_USER_REGISTRATION')
+    AUTH_USER_REGISTRATION_ROLE = config.get('ldap', 'AUTH_USER_REGISTRATION_ROLE')
+    AUTH_LDAP_SERVER = config.get('ldap', 'AUTH_LDAP_SERVER')
+    AUTH_LDAP_BIND_USER = config.get('ldap', 'AUTH_LDAP_BIND_USER')
+    AUTH_LDAP_BIND_PASSWORD = config.get('ldap', 'AUTH_LDAP_BIND_PASSWORD')
+    AUTH_LDAP_SEARCH = config.get('ldap', 'AUTH_LDAP_SEARCH')
+    AUTH_LDAP_UID_FIELD = config.get('ldap', 'AUTH_LDAP_UID_FIELD')
+    AUTH_LDAP_ALLOW_SELF_SIGNED = config.get('ldap', 'AUTH_LDAP_ALLOW_SELF_SIGNED')
+    AUTH_LDAP_USE_TLS = config.get('ldap', 'AUTH_LDAP_USE_TLS')
+    AUTH_LDAP_TLS_DEMAND = config.get('ldap', 'AUTH_LDAP_TLS_DEMAND')
+    AUTH_ROLE_ADMIN = config.get('ldap', 'AUTH_ROLE_ADMIN')
+    AUTH_LDAP_SEARCH_FILTER = config.get('ldap', 'AUTH_LDAP_SEARCH_FILTER')
+    AUTH_LDAP_APPEND_DOMAIN = config.get('ldap', 'AUTH_LDAP_APPEND_DOMAIN')
+    AUTH_LDAP_USERNAME_FORMAT = config.get('ldap', 'AUTH_LDAP_USERNAME_FORMAT')
+    AUTH_LDAP_TLS_CACERTDIR = config.get('ldap', 'AUTH_LDAP_TLS_CACERTDIR')
+    AUTH_LDAP_TLS_CACERTFILE = config.get('ldap', 'AUTH_LDAP_TLS_CACERTFILE')
+    AUTH_LDAP_TLS_CERTFILE = config.get('ldap', 'AUTH_LDAP_TLS_CERTFILE')
+    AUTH_LDAP_TLS_KEYFILE = config.get('ldap', 'AUTH_LDAP_TLS_KEYFILE')
+    AUTH_LDAP_FIRSTNAME_FIELD = config.get('ldap', 'AUTH_LDAP_FIRSTNAME_FIELD')
+    AUTH_LDAP_LASTNAME_FIELD = config.get('ldap', 'AUTH_LDAP_LASTNAME_FIELD')
+    AUTH_LDAP_EMAIL_FIELD = config.get('ldap', 'AUTH_LDAP_EMAIL_FIELD')
+    AUTH_LDAP_BIND_FIRST = config.get('ldap', 'AUTH_LDAP_BIND_FIRST')
+elif AUTH_TYPE == 'AUTH_DB':
+    pass
+else:
+    superset_logger = logging.getLogger("superset")
+    superset_logger.error('Incorrect configuration provided for authentication type(AUTH_TYPE)')
 # AUTH_LDAP_SERVER = "ldap://ldapserver.new"
 
 # Uncomment to setup OpenID providers example for OpenID authentication
@@ -354,14 +391,7 @@ TIME_GRAIN_ADDON_FUNCTIONS: Dict[str, Dict[str, str]] = {}
 
 # ---------------------------------------------------
 # List of viz_types not allowed in your environment
-# For example: Blacklist pivot table and tree
-
-
-
-
-
-
-:
+# For example: Blacklist pivot table and treemap:
 #  VIZ_TYPE_BLACKLIST = ['pivot_table', 'treemap']
 # ---------------------------------------------------
 
@@ -423,7 +453,7 @@ BACKUP_COUNT = 30
 QUERY_LOGGER = None
 
 # Set this API key to enable Mapbox visualizations
-MAPBOX_API_KEY = 'pk.eyJ1Ijoic2hhZ3VuY291dHVyZSIsImEiOiJjazVjaDBwM2ExaGo4M21tdXhtMjA1aW1nIn0.7pcCRC-iFs4nAWRw978vTg'
+MAPBOX_API_KEY = os.environ.get("MAPBOX_API_KEY", "")
 
 # Maximum number of rows returned from a database
 # in async mode, no more than SQL_MAX_ROW will be returned and stored
