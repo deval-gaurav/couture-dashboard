@@ -99,7 +99,7 @@ RUN cd /app \
         && pip install -e .
 
 COPY ./docker/docker-entrypoint.sh /usr/bin/
-
+COPY ./docker/docker-init.sh /app/
 WORKDIR /app
 
 USER superset
