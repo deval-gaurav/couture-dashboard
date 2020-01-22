@@ -69,6 +69,10 @@ from superset import (
     talisman,
     viz,
 )
+from superset.views.helper_functions import *
+from superset.views.extract_db_info import *
+from superset.utils.dashboard_import_export import decode_dashboards
+import time
 from superset.connectors.connector_registry import ConnectorRegistry
 from superset.connectors.sqla.models import AnnotationDatasource
 from superset.exceptions import (
@@ -1851,6 +1855,78 @@ class Superset(BaseSupersetView):
             count = len(favs)
         session.commit()
         return json_success(json.dumps({"count": count}))
+
+    @api
+    @expose("dashboard/<int:dashboard_id>/user_input_form/", methods=["GET"])
+    def change(self, dashboard_id):
+        print("Call to change dashboard")
+        if request.method == "GET":
+            str_id = list(str(dashboard_id))
+            x = models.Dashboard.export_dashboards(str_id)
+            x = json.loads(x)
+            name = x["dashboards"][0]["__Dashboard__"]["dashboard_title"]
+            num = len(x["dashboards"][0]["__Dashboard__"]["slices"])
+            slices_dict = current_slices_info(x)
+
+            return self.render_template("/superset/user_input_form.html",
+                                        id = dashboard_id,
+                                        dashboard_name = name,
+                                        num_slices = num,
+                                        slices_info = slices_dict,
+                                        db_info = database_dict,
+                                        ds_info = datasource_dict)
+
+    @api
+    @expose("/dashboard/<int:dashboard_id>/change_datasource", methods=["POST"])
+    def take_input(self, dashboard_id):
+
+        if request.method == "POST":
+            str_id = list(str(dashboard_id))
+            if dashboard_id != 0:
+                # Export dashboard
+                x = models.Dashboard.export_dashboards(str_id)
+                x = json.loads(x)
+
+                # Export form information
+                num_slices = len(x["dashboards"][0]["__Dashboard__"]["slices"])
+
+                slice_name_list = []
+                datasource_name_list = []
+                datasource_id_list = []
+                database_name_list = []
+                database_id_list = []
+
+                for i in range(num_slices):
+                    slice_name_list.append(request.form["slice_name_"+str(i)])
+                    datasource_name_list.append(request.form["datasource_name_"+str(i)])
+                    database_name_list.append(request.form["database_name_"+str(i)])
+
+                for i in datasource_name_list:
+                    datasource_id_list.append(datasource_dict[i])
+
+                for j in database_name_list:
+                    database_id_list.append(database_dict[j])
+
+                dshbd_name = request.form["new_dshbd_name"]
+
+                x_new = change_dashboard(x, dshbd_name, slice_name_list, datasource_name_list, datasource_id_list, database_name_list, database_id_list)
+
+                # TODO : change path where to keep new dashboard jsons
+                with open("./new.json", 'w') as json_file:
+                    json.dump(x_new, json_file)
+
+                # Import dashboard
+                f = open("./new.json", "rb")
+                import_time = int(time.time())
+                data = json.loads(json.dumps(x_new), object_hook=decode_dashboards)
+                for table in data["datasources"]:
+                    type(table).import_obj(table, import_time=import_time)
+                db.session.commit()
+                for dashboard in data["dashboards"]:
+                    Dashboard.import_obj(dashboard, import_time=import_time)
+                db.session.commit()
+
+            return redirect("/dashboard/list/")
 
     @api
     @has_access_api

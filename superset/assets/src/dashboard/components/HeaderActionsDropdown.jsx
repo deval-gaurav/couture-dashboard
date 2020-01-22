@@ -120,6 +120,7 @@ class HeaderActionsDropdown extends React.PureComponent {
       colorScheme,
       hasUnsavedChanges,
       layout,
+      filters,
       expandedSlices,
       onSave,
       userCanEdit,
@@ -147,6 +148,7 @@ class HeaderActionsDropdown extends React.PureComponent {
             dashboardTitle={dashboardTitle}
             saveType={SAVE_TYPE_NEWDASHBOARD}
             layout={layout}
+            filters={filters}
             expandedSlices={expandedSlices}
             refreshFrequency={refreshFrequency}
             css={css}
@@ -174,6 +176,11 @@ class HeaderActionsDropdown extends React.PureComponent {
 
         <MenuItem onClick={forceRefreshAllCharts} disabled={isLoading}>
           {t('Force refresh dashboard')}
+        </MenuItem>
+
+        <MenuItem onClick = {() => {fetch(`/superset/dashboard/${dashboardId}/change_datasource`).then((res) => console.log(res))}}
+                 target="_blank" href={`/superset/dashboard/${dashboardId}/user_input_form`}>
+                  {t('Change datasource')}
         </MenuItem>
 
         <RefreshIntervalModal
