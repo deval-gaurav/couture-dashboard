@@ -327,12 +327,7 @@ function nvd3Vis(element, props) {
           chart.x2Axis.staggerLabels(false);
         } else {
           chart = nv.models.lineChart();
-          // chart.focus.xScale(d3.scale.linear());
-          // chart.x2Axis.staggerLabels(false);
-          // console.log(chart);
         }
-        console.log("datata", data);
-        // chart.focus.xScale(d3.scale.linear());
         chart.xScale(d3.scale.linear());
         chart.interpolate(lineInterpolation);
         chart.xAxis.staggerLabels(false);

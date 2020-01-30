@@ -20,7 +20,6 @@
 These objects represent the backend of all the visualizations that
 Superset can render.
 """
-import pprint
 import copy
 import hashlib
 import inspect
@@ -1094,7 +1093,6 @@ class NVD3LineXYViz(NVD3Viz):
     def query_obj(self):
         d = super(NVD3LineXYViz, self).query_obj()
         fd = self.form_data
-        pprint.pprint(fd)
         if fd.get('all_columns') and (fd.get('groupby') or fd.get('metrics')):
             raise Exception(_(
                 'Choose either fields to [Group By] and [Metrics] or '
@@ -1126,7 +1124,6 @@ class NVD3LineXYViz(NVD3Viz):
         if len(sliceby_keys) > 0:
             df = df.groupby(sliceby_keys)
 
-        pprint.pprint(df)
         for y_field in y_fields:
             if len(sliceby_keys) > 0:
                 for key, rows in df:
@@ -1140,15 +1137,12 @@ class NVD3LineXYViz(NVD3Viz):
             else:
                 series = self.convert_rows(x_field, y_field, y_field, df)
                 result_list.append(series)
-        pprint.pprint(result_list)
         return result_list
 
     @staticmethod
     def convert_rows(x_field, y_field, key, rows):
         values = []
         for row in rows.to_dict(orient='records'):
-            # print(row)
-            # values.append(row)
             value = {
                 'x': row[x_field],
                 'y': row[y_field],
@@ -1159,7 +1153,6 @@ class NVD3LineXYViz(NVD3Viz):
             'key': key,
             'values': values,
         }
-        print(series)
         return series
 
 

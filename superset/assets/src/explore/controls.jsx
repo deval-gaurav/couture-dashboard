@@ -571,27 +571,17 @@ export const controls = {
       
       let choices = [];
       if (state.controls && state.datasource) {
-        // console.log('YAYAYAYYAYAYYA', state.controls, state.datasource);
         const gbSet = new Set((state.controls.groupby || {}).value || []);
-        // const gbSelectables = state.datasource.columns.filter(elem => elem.groupby);
-
-        // const mSet = new Set((state.controls.metrics || {}).value || []);
-        // console.log(state.controls.metrics.value);
         const mSelectables = state.controls.metrics.value.map(elem => {
-          console.log(elem, "njfnfjnfjnfjfnj");
           return { column_name: elem.label}; 
         }) || [];
 
-        // console.log(mSelectables);
-        // const cSet = new Set((state.controls.all_columns || {}).value || []);
         const cSelectables = state.datasource.columns.filter(elem => gbSet.has(elem.column_name) && numTypes.has(elem.type));
-        // choices = [...gbSelectables, ...mSelectables, ...cSelectables];
         choices = [...mSelectables, ...cSelectables];
       } else {
         const formValue = (state.form_data || {}).columns_and_metrics_x || [];
         choices = [[formValue, formValue]];
       }
-      // console.log("YADADADDA", choices);
       return {
         choices: columnChoices({ columns: choices})
       };
@@ -606,21 +596,12 @@ export const controls = {
     description: t('Columns or metrics to display'),
     mapStateToProps: (state) => {
       let choices = [];
-      console.log(state.datasource);
       if (state.controls && state.datasource) {
-        // console.log('YAYAYAYYAYAYYA', state.controls);
         const gbSet = new Set((state.controls.groupby || {}).value || []);
-        // const gbSelectables = state.datasource.columns.filter(elem => elem.groupby);
-
-        // const mSet = new Set((state.controls.metrics || {}).value || []);
-        // const mSelectables = state.datasource.metrics.filter(elem => elem.groupby);
         const mSelectables = state.controls.metrics.value.map(elem => {
-          // console.log(elem, "njfnfjnfjnfjfnj");
           return { column_name: elem.label}; 
         }) || [];
-        // const cSet = new Set((state.controls.all_columns || {}).value || []);
         const cSelectables = state.datasource.columns.filter(elem => gbSet.has(elem.column_name) && numTypes.has(elem.type));
-        // choices = [...gbSelectables, ...mSelectables, ...cSelectables];
         choices = [...mSelectables, ...cSelectables];
       } else {
         const formValue = (state.form_data || {}).columns_and_metrics_x || [];

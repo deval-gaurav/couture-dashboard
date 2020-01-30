@@ -30,7 +30,6 @@ const metadata = new ChartMetadata({
 
 export default class LineXYChartPlugin extends ChartPlugin {
   constructor() {
-    // console.log('fhjfhjfhjhfjhfjhfjfhjfhjfhjfhjhjhj')
     super({
       metadata,
       transformProps,
