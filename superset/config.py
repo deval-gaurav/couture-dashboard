@@ -361,7 +361,7 @@ TIME_GRAIN_ADDON_FUNCTIONS: Dict[str, Dict[str, str]] = {}
 
 
 
-:
+
 #  VIZ_TYPE_BLACKLIST = ['pivot_table', 'treemap']
 # ---------------------------------------------------
 

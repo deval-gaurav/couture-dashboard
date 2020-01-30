@@ -125,6 +125,19 @@ const sortAxisChoices = [
   ['value_desc', 'sum(value) descending'],
 ];
 
+const numTypes = new Set([
+  "DOUBLE",
+  "FLOAT",
+  "INT",
+  "BIGINT",
+  "NUMBER",
+  "LONG",
+  "REAL",
+  "NUMERIC",
+  "DECIMAL",
+  "MONEY",
+]);
+
 const groupByControl = {
   type: 'SelectControl',
   multi: true,
@@ -533,6 +546,14 @@ export const controls = {
     description: t('Show data points as circle markers on the lines'),
   },
 
+  hide_lines: {
+    type: 'CheckboxControl',
+    label: t('Hide Lines'),
+    renderTrigger: true,
+    default: false,
+    description: t('Hide lines between data points'),
+  },
+
   show_bar_value: {
     type: 'CheckboxControl',
     label: t('Bar Values'),
@@ -540,6 +561,109 @@ export const controls = {
     renderTrigger: true,
     description: t('Show the value on top of the bar'),
   },
+
+  columns_and_metrics_x: {
+    type: 'SelectControl',
+    label: t('X Axis'),
+    default: null,
+    description: t('Column or metric to display'),
+    mapStateToProps: (state) => {
+      
+      let choices = [];
+      if (state.controls && state.datasource) {
+        // console.log('YAYAYAYYAYAYYA', state.controls, state.datasource);
+        const gbSet = new Set((state.controls.groupby || {}).value || []);
+        // const gbSelectables = state.datasource.columns.filter(elem => elem.groupby);
+
+        // const mSet = new Set((state.controls.metrics || {}).value || []);
+        // console.log(state.controls.metrics.value);
+        const mSelectables = state.controls.metrics.value.map(elem => {
+          console.log(elem, "njfnfjnfjnfjfnj");
+          return { column_name: elem.label}; 
+        }) || [];
+
+        // console.log(mSelectables);
+        // const cSet = new Set((state.controls.all_columns || {}).value || []);
+        const cSelectables = state.datasource.columns.filter(elem => gbSet.has(elem.column_name) && numTypes.has(elem.type));
+        // choices = [...gbSelectables, ...mSelectables, ...cSelectables];
+        choices = [...mSelectables, ...cSelectables];
+      } else {
+        const formValue = (state.form_data || {}).columns_and_metrics_x || [];
+        choices = [[formValue, formValue]];
+      }
+      // console.log("YADADADDA", choices);
+      return {
+        choices: columnChoices({ columns: choices})
+      };
+    },
+  },
+
+  columns_and_metrics_y: {
+    type: 'SelectControl',
+    multi: true,
+    label: t('Y Axis'),
+    default: [],
+    description: t('Columns or metrics to display'),
+    mapStateToProps: (state) => {
+      let choices = [];
+      console.log(state.datasource);
+      if (state.controls && state.datasource) {
+        // console.log('YAYAYAYYAYAYYA', state.controls);
+        const gbSet = new Set((state.controls.groupby || {}).value || []);
+        // const gbSelectables = state.datasource.columns.filter(elem => elem.groupby);
+
+        // const mSet = new Set((state.controls.metrics || {}).value || []);
+        // const mSelectables = state.datasource.metrics.filter(elem => elem.groupby);
+        const mSelectables = state.controls.metrics.value.map(elem => {
+          // console.log(elem, "njfnfjnfjnfjfnj");
+          return { column_name: elem.label}; 
+        }) || [];
+        // const cSet = new Set((state.controls.all_columns || {}).value || []);
+        const cSelectables = state.datasource.columns.filter(elem => gbSet.has(elem.column_name) && numTypes.has(elem.type));
+        // choices = [...gbSelectables, ...mSelectables, ...cSelectables];
+        choices = [...mSelectables, ...cSelectables];
+      } else {
+        const formValue = (state.form_data || {}).columns_and_metrics_x || [];
+        choices = [[formValue, formValue]];
+      }
+      return {
+        choices: columnChoices({ columns: choices})
+      };
+    },
+  },
+
+  // slice_by: {
+  //   type: 'SelectControl',
+  //   multi: true,
+  //   label: t('Slice By'),
+  //   default: [],
+  //   description: t('Columns to slice by'),
+  //   mapStateToProps: (state) => {
+  //     let choices = [];
+  //     if (state.controls && state.datasource) {
+  //       // console.log('YAYAYAYYAYAYYA', state.controls);
+  //       const gbSet = new Set((state.controls.groupby || {}).value || []);
+  //       // const gbSelectables = state.datasource.columns.filter(elem => elem.groupby);
+
+  //       // const mSet = new Set((state.controls.metrics || {}).value || []);
+  //       // const mSelectables = state.datasource.metrics.filter(elem => elem.groupby);
+  //       // const mSelectables = state.controls.metrics.value.map(elem => {
+  //       //   // console.log(elem, "njfnfjnfjnfjfnj");
+  //       //   return { column_name: elem.label}; 
+  //       // }) || [];
+  //       // const cSet = new Set((state.controls.all_columns || {}).value || []);
+  //       const cSelectables = state.datasource.columns.filter(elem => gbSet.has(elem.column_name));
+  //       // choices = [...gbSelectables, ...mSelectables, ...cSelectables];
+  //       choices = [...mSelectables, ...cSelectables];
+  //     } else {
+  //       const formValue = (state.form_data || {}).columns_and_metrics_x || [];
+  //       choices = [[formValue, formValue]];
+  //     }
+  //     return {
+  //       choices: columnChoices({ columns: choices})
+  //     };
+  //   },
+  // },
 
   order_bars: {
     type: 'CheckboxControl',

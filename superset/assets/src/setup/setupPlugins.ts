@@ -51,6 +51,7 @@ import Horizon from '../explore/controlPanels/Horizon';
 import Iframe from '../explore/controlPanels/Iframe';
 import Line from '../explore/controlPanels/Line';
 import LineMulti from '../explore/controlPanels/LineMulti';
+import LineXY from '../explore/controlPanels/LineXY';
 import Mapbox from '../explore/controlPanels/Mapbox';
 import Markup from '../explore/controlPanels/Markup';
 import PairedTtest from '../explore/controlPanels/PairedTtest';
@@ -95,6 +96,7 @@ export default function setupPlugins() {
     .registerValue('horizon', Horizon)
     .registerValue('iframe', Iframe)
     .registerValue('line', Line)
+    .registerValue('line_xy', LineXY)
     .registerValue('line_multi', LineMulti)
     .registerValue('mapbox', Mapbox)
     .registerValue('markup', Markup)
