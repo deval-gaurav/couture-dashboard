@@ -67,6 +67,7 @@ import { DeckGLChartPreset } from '@superset-ui/legacy-preset-chart-deckgl';
 import FilterBoxChartPlugin from '../FilterBox/FilterBoxChartPlugin';
 import TimeTableChartPlugin from '../TimeTable/TimeTableChartPlugin';
 import LineXYChartPlugin from '../LineXY/LineXYChartPlugin';
+import CoutureSankeyChartPlugin from '../CoutureSankey/CoutureSankey';
 
 export default class MainPreset extends Preset {
   constructor() {
@@ -106,6 +107,7 @@ export default class MainPreset extends Preset {
         new PivotTableChartPlugin().configure({ key: 'pivot_table' }),
         new RoseChartPlugin().configure({ key: 'rose' }),
         new SankeyChartPlugin().configure({ key: 'sankey' }),
+        new CoutureSankeyChartPlugin().configure({ key: 'couture_sankey' }),
         new SunburstChartPlugin().configure({ key: 'sunburst' }),
         new TableChartPlugin().configure({ key: 'table' }),
         new TimePivotChartPlugin().configure({ key: 'time_pivot' }),

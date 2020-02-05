@@ -188,9 +188,19 @@ const metrics = {
   },
   description: t('One or many metrics to display'),
 };
+
 const metric = {
   ...metrics,
   multi: false,
+  label: t('Metric'),
+  description: t('Metric'),
+  default: props => mainMetric(props.savedMetrics),
+};
+
+const canBeEmptyMetric = {
+  ...metrics,
+  multi: false,
+  validators: [],
   label: t('Metric'),
   description: t('Metric'),
   default: props => mainMetric(props.savedMetrics),
@@ -256,6 +266,7 @@ export const controls = {
   metrics,
 
   metric,
+  canBeEmptyMetric,
 
   datasource: {
     type: 'DatasourceControl',

@@ -69,6 +69,7 @@ import TimeTable from '../explore/controlPanels/TimeTable';
 import Treemap from '../explore/controlPanels/Treemap';
 import WordCloud from '../explore/controlPanels/WordCloud';
 import WorldMap from '../explore/controlPanels/WorldMap';
+import CoutureSankey from 'src/explore/controlPanels/CoutureSankey';
 
 export default function setupPlugins() {
   new MainPreset().register();
@@ -107,6 +108,7 @@ export default function setupPlugins() {
     .registerValue('pivot_table', PivotTable)
     .registerValue('rose', Rose)
     .registerValue('sankey', Sankey)
+    .registerValue('couture_sankey', CoutureSankey)
     .registerValue('separator', Separator)
     .registerValue('sunburst', Sunburst)
     .registerValue('table', Table)
