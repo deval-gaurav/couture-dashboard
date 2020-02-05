@@ -30,17 +30,23 @@ export default {
         ['metrics'],
       ],
     },
-    // {
-    //   label: t('NOT GROUPED BY'),
-    //   description: t('Use this section if you want to query atomic rows'),
-    //   controlSetRows: [
-    //     ['all_columns'],
-    //   ],
-    // },
+    {
+      label: t('NOT GROUPED BY'),
+      description: t('Use this section if you want to query atomic rows'),
+      controlSetRows: [
+        ['all_columns'],
+      ],
+    },
     {
       label: t('Row Limit'),
       controlSetRows: [
         ['row_limit'],
+      ],
+    },
+    {
+      label: t('Filter By'),
+      controlSetRows: [
+        ['adhoc_filters'],
       ],
     },
     {

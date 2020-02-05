@@ -1760,17 +1760,22 @@ class CoutureSankeyViz(BaseViz):
         if len(qry["groupby"]) < 2:
             raise Exception(_("Pick more than 2 columns as [Source & Target]"))
         qry["metrics"] = [self.form_data["canBeEmptyMetric"]] if self.form_data.get("canBeEmptyMetric") else []
+        qry['groupby'] = self.form_data["groupby"]
         return qry
 
     def get_data(self, df: pd.DataFrame) -> VizData:
         qry = self.query_obj()
         data = pd.DataFrame(columns=['source', 'target', 'value'])
-        for col_no in range(0, len(qry["groupby"])-1, 1):
-            temp = pd.DataFrame({'value': df.groupby([qry["groupby"][col_no], qry["groupby"][col_no + 1]]).size()}).reset_index()
+        # print("griiii", self.form_data["groupby"])
+        for col_no in range(0, len(self.form_data["groupby"])-1, 1):
+            temp = pd.DataFrame({'value': df.groupby([self.form_data["groupby"][col_no], self.form_data["groupby"][col_no + 1]]).size()}).reset_index()
             temp.columns = ['source', 'target', 'value']
             data = data.append(temp)
+
+        data["source"] = data["source"].astype(str)
+        data["target"] = data["target"].astype(str)
         recs = data.to_dict(orient="records")
-        pprint.pprint(recs)
+        # pprint.pprint(recs)
 
         hierarchy: Dict[str, Set[str]] = defaultdict(set)
         for row in recs:

@@ -18,6 +18,8 @@
  */
 /* eslint-disable no-magic-numbers, complexity, sort-keys */
 /* eslint-disable no-plusplus, react/forbid-prop-types */
+
+// TODO: Clean this file up more.
 import { kebabCase, throttle } from 'lodash';
 import d3 from 'd3';
 import nv from 'nvd3';
@@ -89,44 +91,13 @@ const TIMESERIES_VIZ_TYPES = [
 ];
 
 const propTypes = {
-  data: PropTypes.oneOfType([
+  data: 
     PropTypes.arrayOf(
-      PropTypes.oneOfType([
-        // pie
-        categoryAndValueXYType,
-        // dist-bar
-        PropTypes.shape({
-          key: PropTypes.string,
-          values: PropTypes.arrayOf(categoryAndValueXYType),
-        }),
-        // area, line, compare, bar
-        PropTypes.shape({
-          key: PropTypes.arrayOf(PropTypes.string),
-          values: PropTypes.arrayOf(numericXYType),
-        }),
-        // dual-line
-        PropTypes.shape({
-          classed: PropTypes.string,
-          key: PropTypes.string,
-          type: PropTypes.string,
-          values: PropTypes.arrayOf(numericXYType),
-          yAxis: PropTypes.number,
-        }),
-        // box-plot
-        PropTypes.shape({
-          label: PropTypes.string,
-          values: PropTypes.arrayOf(boxPlotValueType),
-        }),
-        // bubble
-        PropTypes.shape({
-          key: PropTypes.string,
-          values: PropTypes.arrayOf(PropTypes.object),
-        }),
-      ]),
+      PropTypes.shape({
+        key: PropTypes.string,
+        values: PropTypes.arrayOf(numericXYType),
+      }),
     ),
-    // bullet
-    bulletDataType,
-  ]),
   width: PropTypes.number,
   height: PropTypes.number,
   annotationData: PropTypes.object,
@@ -141,19 +112,6 @@ const propTypes = {
   showMarkers: PropTypes.bool,
   useRichTooltip: PropTypes.bool,
   vizType: PropTypes.oneOf([
-    'area',
-    'bar',
-    'box_plot',
-    'bubble',
-    'bullet',
-    'compare',
-    'column',
-    'dist_bar',
-    'line',
-    'line_multi',
-    'time_pivot',
-    'pie',
-    'dual_line',
     'line_xy'
   ]),
   xAxisFormat: PropTypes.string,
@@ -301,163 +259,18 @@ function nvd3Vis(element, props) {
       (showBrush === 'auto' && maxHeight >= MIN_HEIGHT_FOR_BRUSH && xTicksLayout !== '45°');
     const numberFormatter = getNumberFormatter(numberFormat);
 
-    switch (vizType) {
-      case 'line':
-        if (canShowBrush) {
-          chart = nv.models.lineWithFocusChart();
-          if (staggerLabels) {
-            // Give a bit more room to focus area if X axis ticks are staggered
-            chart.focus.margin({ bottom: 40 });
-            chart.focusHeight(80);
-          }
-          chart.focus.xScale(d3.time.scale.utc());
-        } else {
-          chart = nv.models.lineChart();
-        }
-        chart.xScale(d3.time.scale.utc());
-        chart.interpolate(lineInterpolation);
-        chart.clipEdge(false);
-        break;
-
-        case 'line_xy':
-        // rich_tooltip = false;
-        if (canShowBrush) {
-          chart = nv.models.lineWithFocusChart();
-          chart.focus.xScale(d3.scale.linear());
-          chart.x2Axis.staggerLabels(false);
-        } else {
-          chart = nv.models.lineChart();
-        }
-        chart.xScale(d3.scale.linear());
-        chart.interpolate(lineInterpolation);
-        chart.xAxis.staggerLabels(false);
-        break;
-      
-      case 'time_pivot':
-        chart = nv.models.lineChart();
-        chart.xScale(d3.time.scale.utc());
-        chart.interpolate(lineInterpolation);
-        break;
-
-      case 'dual_line':
-      case 'line_multi':
-        chart = nv.models.multiChart();
-        chart.interpolate(lineInterpolation);
-        break;
-
-      case 'bar':
-        chart = nv.models
-          .multiBarChart()
-          .showControls(showControls)
-          .groupSpacing(0.1);
-
-        if (!reduceXTicks) {
-          width = computeBarChartWidth(data, isBarStacked, maxWidth);
-        }
-        chart.width(width);
-        chart.xAxis.showMaxMin(false);
-        chart.stacked(isBarStacked);
-        break;
-
-      case 'dist_bar':
-        chart = nv.models
-          .multiBarChart()
-          .showControls(showControls)
-          .reduceXTicks(reduceXTicks)
-          .groupSpacing(0.1); // Distance between each group of bars.
-
-        chart.xAxis.showMaxMin(false);
-
-        chart.stacked(isBarStacked);
-        if (orderBars) {
-          data.forEach(d => {
-            d.values.sort((a, b) => (tryNumify(a.x) < tryNumify(b.x) ? -1 : 1));
-          });
-        }
-        if (!reduceXTicks) {
-          width = computeBarChartWidth(data, isBarStacked, maxWidth);
-        }
-        chart.width(width);
-        break;
-
-      case 'pie':
-        chart = nv.models.pieChart();
-        colorKey = 'x';
-        chart.valueFormat(numberFormatter);
-        if (isDonut) {
-          chart.donut(true);
-        }
-        chart.showLabels(showLabels);
-        chart.labelsOutside(isPieLabelOutside);
-        // Configure the minimum slice size for labels to show up
-        chart.labelThreshold(0.05);
-        chart.cornerRadius(true);
-
-        if (['key', 'value', 'percent'].indexOf(pieLabelType) >= 0) {
-          chart.labelType(pieLabelType);
-        } else if (pieLabelType === 'key_value') {
-          chart.labelType(d => `${d.data.x}: ${numberFormatter(d.data.y)}`);
-        } else if (pieLabelType === 'key_percent') {
-          const total = d3.sum(data, d => d.y);
-          chart.tooltip.valueFormatter(d => `${((d / total) * 100).toFixed()}%`);
-          chart.labelType(d => `${d.data.x}: ${((d.data.y / total) * 100).toFixed()}%`);
-        }
-        // Pie chart does not need top margin
-        chart.margin({ top: 0 });
-        break;
-
-      case 'column':
-        chart = nv.models.multiBarChart().reduceXTicks(false);
-        break;
-
-      case 'compare':
-        chart = nv.models.cumulativeLineChart();
-        chart.xScale(d3.time.scale.utc());
-        chart.useInteractiveGuideline(true);
-        chart.xAxis.showMaxMin(false);
-        break;
-
-      case 'bubble':
-        chart = nv.models.scatterChart();
-        chart.showDistX(false);
-        chart.showDistY(false);
-        chart.tooltip.contentGenerator(d =>
-          generateBubbleTooltipContent({
-            point: d.point,
-            entity,
-            xField,
-            yField,
-            sizeField,
-            xFormatter: getTimeOrNumberFormatter(xAxisFormat),
-            yFormatter: getTimeOrNumberFormatter(yAxisFormat),
-            sizeFormatter: formatter,
-          }),
-        );
-        chart.pointRange([5, maxBubbleSize ** 2]);
-        chart.pointDomain([0, d3.max(data, d => d3.max(d.values, v => v.size))]);
-        break;
-
-      case 'area':
-        chart = nv.models.stackedAreaChart();
-        chart.showControls(showControls);
-        chart.style(areaStackedStyle);
-        chart.xScale(d3.time.scale.utc());
-        break;
-
-      case 'box_plot':
-        colorKey = 'label';
-        chart = nv.models.boxPlotChart();
-        chart.x(d => d.label);
-        chart.maxBoxWidth(75); // prevent boxes from being incredibly wide
-        break;
-
-      case 'bullet':
-        chart = nv.models.bulletChart();
-        break;
-
-      default:
-        throw new Error(`Unrecognized visualization for nvd3${vizType}`);
+    
+    if (canShowBrush) {
+      chart = nv.models.lineWithFocusChart();
+      chart.focus.xScale(d3.scale.linear());
+      chart.x2Axis.staggerLabels(false);
+    } else {
+      chart = nv.models.lineChart();
     }
+    chart.xScale(d3.scale.linear());
+    chart.interpolate(lineInterpolation);
+    chart.xAxis.staggerLabels(false);
+
     // Assuming the container has padding already other than for top margin
     chart.margin({ left: 0, right: 0, bottom: 0 });
 
@@ -495,7 +308,7 @@ function nvd3Vis(element, props) {
     }
 
     if ('showLegend' in chart && typeof showLegend !== 'undefined') {
-      if (width < BREAKPOINTS.small && vizType !== 'pie') {
+      if (width < BREAKPOINTS.small) {
         chart.showLegend(false);
       } else {
         chart.showLegend(showLegend);
@@ -558,57 +371,11 @@ function nvd3Vis(element, props) {
     setAxisShowMaxMin(chart.yAxis, yAxisShowMinMax);
     setAxisShowMaxMin(chart.y2Axis, yAxisShowMinMax);
 
-    if (vizType === 'time_pivot') {
-      if (baseColor) {
-        const { r, g, b } = baseColor;
-        chart.color(d => {
-          const alpha = d.rank > 0 ? d.perc * 0.5 : 1;
-
-          return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-        });
-      }
-
-      chart.useInteractiveGuideline(true);
-      chart.interactiveLayer.tooltip.contentGenerator(d =>
-        generateTimePivotTooltip(d, xAxisFormatter, yAxisFormatter),
-      );
-    } else if (vizType !== 'bullet') {
-      const colorFn = getScale(colorScheme);
-      chart.color(d => d.color || colorFn(cleanColorInput(d[colorKey])));
-    }
-
-    if (isVizTypes(['line', 'area']) && useRichTooltip) {
-      chart.useInteractiveGuideline(true);
-      if (vizType === 'line') {
-        chart.interactiveLayer.tooltip.contentGenerator(d =>
-          generateRichLineTooltipContent(d, smartDateVerboseFormatter, yAxisFormatter),
-        );
-      } else if (areaStackedStyle !== 'expand') {
-        // area chart
-        chart.interactiveLayer.tooltip.contentGenerator(d =>
-          generateAreaChartTooltipContent(d, smartDateVerboseFormatter, yAxisFormatter),
-        );
-      }
-    }
-
-    if (isVizTypes(['dual_line', 'line_multi'])) {
-      const yAxisFormatter1 = getNumberFormatter(yAxisFormat);
-      const yAxisFormatter2 = getNumberFormatter(yAxis2Format);
-      chart.yAxis1.tickFormat(yAxisFormatter1);
-      chart.yAxis2.tickFormat(yAxisFormatter2);
-      const yAxisFormatters = data.map(datum =>
-        datum.yAxis === 1 ? yAxisFormatter1 : yAxisFormatter2,
-      );
-      chart.useInteractiveGuideline(true);
-      chart.interactiveLayer.tooltip.contentGenerator(d =>
-        generateMultiLineTooltipContent(d, xAxisFormatter, yAxisFormatters),
-      );
-      if (vizType === 'dual_line') {
-        chart.showLegend(width > BREAKPOINTS.small);
-      } else {
-        chart.showLegend(showLegend);
-      }
-    }
+    chart.useInteractiveGuideline(true);
+    // chart.interactiveLayer.tooltip.contentGenerator(d =>
+    //   generateRichLineTooltipContent(d, smartDateVerboseFormatter, yAxisFormatter),
+    // );
+    
     // This is needed for correct chart dimensions if a chart is rendered in a hidden container
     chart.width(width);
     chart.height(height);
@@ -681,38 +448,7 @@ function nvd3Vis(element, props) {
       chart.dispatch.on('stateChange.applyYAxisBounds', applyYAxisBounds);
     }
 
-    // align yAxis1 and yAxis2 ticks
-    if (isVizTypes(['dual_line', 'line_multi'])) {
-      const count = chart.yAxis1.ticks();
-      const ticks1 = chart.yAxis1
-        .scale()
-        .domain(chart.yAxis1.domain())
-        .nice(count)
-        .ticks(count);
-      const ticks2 = chart.yAxis2
-        .scale()
-        .domain(chart.yAxis2.domain())
-        .nice(count)
-        .ticks(count);
 
-      // match number of ticks in both axes
-      const difference = ticks1.length - ticks2.length;
-      if (ticks1.length && ticks2.length && difference !== 0) {
-        const smallest = difference < 0 ? ticks1 : ticks2;
-        const delta = smallest[1] - smallest[0];
-        for (let i = 0; i < Math.abs(difference); i++) {
-          if (i % 2 === 0) {
-            smallest.unshift(smallest[0] - delta);
-          } else {
-            smallest.push(smallest[smallest.length - 1] + delta);
-          }
-        }
-        chart.yDomain1([ticks1[0], ticks1[ticks1.length - 1]]);
-        chart.yDomain2([ticks2[0], ticks2[ticks2.length - 1]]);
-        chart.yAxis1.tickValues(ticks1);
-        chart.yAxis2.tickValues(ticks2);
-      }
-    }
 
     if (showMarkers) {
       svg
@@ -768,10 +504,9 @@ function nvd3Vis(element, props) {
         margins.bottom = 40;
       }
 
-      if (isVizTypes(['dual_line', 'line_multi'])) {
-        const maxYAxis2LabelWidth = getMaxLabelSize(svg, 'nv-y2');
-        margins.right = maxYAxis2LabelWidth + marginPad;
-      }
+      const maxYAxis2LabelWidth = getMaxLabelSize(svg, 'nv-y2');
+      margins.right = maxYAxis2LabelWidth + marginPad;
+      
       if (bottomMargin && bottomMargin !== 'auto') {
         margins.bottom = parseInt(bottomMargin, 10);
       }
