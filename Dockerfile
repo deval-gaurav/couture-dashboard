@@ -84,6 +84,7 @@ RUN useradd --user-group --no-create-home --no-log-init --shell /bin/bash supers
             libldap2-dev \
             libssl-dev\
             libpq-dev \
+            default-mysql-client \
         && rm -rf /var/lib/apt/lists/*
 
 COPY --from=superset-py /usr/local/lib/python3.6/site-packages/ /usr/local/lib/python3.6/site-packages/

@@ -128,9 +128,16 @@ SECRET_KEY = (
 )
 
 # The SQLAlchemy connection string.
+DB_DIALECT = os.environ.get("DATABASE_DIALECT", "postgresql")
+DB_USER = os.environ.get("DATABASE_USER", "superset")
+DB_PASSWORD = os.environ.get("DATABASE_PASSWORD", "superset")
+DB_HOST = os.environ.get("DATABASE_HOST", "db")
+DB_PORT = os.environ.get("DATABASE_PORT", "5432")
+DB_DATABASE = os.environ.get("DATABASE_DB", "superset")
+
 # SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(DATA_DIR, "superset.db")
-# SQLALCHEMY_DATABASE_URI = 'mysql://myapp@localhost/myapp'
-SQLALCHEMY_DATABASE_URI = 'postgresql://superset:superset@db/superset'
+SQLALCHEMY_DATABASE_URI = DB_DIALECT + "://" + DB_USER + ":" + DB_PASSWORD + "@" + DB_HOST + "/" + DB_DATABASE
+# SQLALCHEMY_DATABASE_URI = 'postgresql://superset:superset@db/superset'
 
 # In order to hook up a custom password store for all SQLACHEMY connections
 # implement a function that takes a single argument of type 'sqla.engine.url',
@@ -489,9 +496,9 @@ WARNING_MSG = None
 
 
 class CeleryConfig:  # pylint: disable=too-few-public-methods
-    BROKER_URL = "sqla+postgresql://superset:superset@db/superset" #"sqla+sqlite:///celerydb.sqlite"
+    BROKER_URL = "sqla+" + SQLALCHEMY_DATABASE_URI #"sqla+sqlite:///celerydb.sqlite"
     CELERY_IMPORTS = ("superset.sql_lab", "superset.tasks")
-    CELERY_RESULT_BACKEND = "db+postgresql://superset:superset@db/superset" #"db+sqlite:///celery_results.sqlite"
+    CELERY_RESULT_BACKEND = "db+" + SQLALCHEMY_DATABASE_URI #db+mysql://superset:superset@db/superset"
     CELERYD_LOG_LEVEL = "DEBUG"
     CELERYD_PREFETCH_MULTIPLIER = 1
     CELERY_ACKS_LATE = False

@@ -1868,6 +1868,8 @@ class Superset(BaseSupersetView):
             num = len(x["dashboards"][0]["__Dashboard__"]["slices"])
             slices_dict = current_slices_info(x)
 
+            datasource_dict, database_dict = sql_table_fetch()
+
             return self.render_template("/superset/user_input_form.html",
                                         id = dashboard_id,
                                         dashboard_name = name,
@@ -1895,6 +1897,8 @@ class Superset(BaseSupersetView):
                 datasource_id_list = []
                 database_name_list = []
                 database_id_list = []
+
+                datasource_dict, database_dict = sql_table_fetch()
 
                 for i in range(num_slices):
                     slice_name_list.append(request.form["slice_name_"+str(i)])

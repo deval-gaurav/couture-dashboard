@@ -25,6 +25,3 @@ def sql_table_fetch():
             datasource_dict[ds_key] = ds_value
 
     return datasource_dict, database_dict
-
-
-datasource_dict, database_dict = sql_table_fetch()
