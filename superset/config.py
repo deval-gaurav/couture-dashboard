@@ -136,7 +136,7 @@ DB_PORT = os.environ.get("DATABASE_PORT", "5432")
 DB_DATABASE = os.environ.get("DATABASE_DB", "superset")
 
 # SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(DATA_DIR, "superset.db")
-SQLALCHEMY_DATABASE_URI = DB_DIALECT + "://" + DB_USER + ":" + DB_PASSWORD + "@" + DB_HOST + "/" + DB_DATABASE
+SQLALCHEMY_DATABASE_URI = f'{DB_DIALECT}://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_DATABASE}'
 # SQLALCHEMY_DATABASE_URI = 'postgresql://superset:superset@db/superset'
 
 # In order to hook up a custom password store for all SQLACHEMY connections
@@ -214,44 +214,44 @@ DRUID_IS_ACTIVE = False
 # AUTH_DB : Is for database (username/password)
 # AUTH_LDAP : Is for LDAP
 # AUTH_REMOTE_USER : Is for using REMOTE_USER from web server
-# AUTH_TYPE = AUTH_DB
-SUPERSET_HOME = os.environ["SUPERSET_HOME"]
-ldap_conf_path = SUPERSET_HOME + '/ldap.conf'
-config = CP.ConfigParser()
-config.optionxform = str
-config.read(filenames=ldap_conf_path)
-AUTH_TYPE_STRING = config.get('ldap', 'AUTH_TYPE')
-if AUTH_TYPE_STRING == 'AUTH_LDAP':
-    AUTH_TYPE = AUTH_LDAP
-    AUTH_ROLE_PUBLIC = config.get('ldap', 'AUTH_ROLE_PUBLIC')
-    AUTH_USER_REGISTRATION = config.get('ldap', 'AUTH_USER_REGISTRATION')
-    AUTH_USER_REGISTRATION_ROLE = config.get('ldap', 'AUTH_USER_REGISTRATION_ROLE')
-    AUTH_LDAP_SERVER = config.get('ldap', 'AUTH_LDAP_SERVER')
-    AUTH_LDAP_BIND_USER = config.get('ldap', 'AUTH_LDAP_BIND_USER')
-    AUTH_LDAP_BIND_PASSWORD = config.get('ldap', 'AUTH_LDAP_BIND_PASSWORD')
-    AUTH_LDAP_SEARCH = config.get('ldap', 'AUTH_LDAP_SEARCH')
-    AUTH_LDAP_UID_FIELD = config.get('ldap', 'AUTH_LDAP_UID_FIELD')
-    AUTH_LDAP_ALLOW_SELF_SIGNED = config.get('ldap', 'AUTH_LDAP_ALLOW_SELF_SIGNED')
-    AUTH_LDAP_USE_TLS = config.get('ldap', 'AUTH_LDAP_USE_TLS')
-    AUTH_LDAP_TLS_DEMAND = config.get('ldap', 'AUTH_LDAP_TLS_DEMAND')
-    AUTH_ROLE_ADMIN = config.get('ldap', 'AUTH_ROLE_ADMIN')
-    AUTH_LDAP_SEARCH_FILTER = config.get('ldap', 'AUTH_LDAP_SEARCH_FILTER')
-    AUTH_LDAP_APPEND_DOMAIN = config.get('ldap', 'AUTH_LDAP_APPEND_DOMAIN')
-    AUTH_LDAP_USERNAME_FORMAT = config.get('ldap', 'AUTH_LDAP_USERNAME_FORMAT')
-    AUTH_LDAP_TLS_CACERTDIR = config.get('ldap', 'AUTH_LDAP_TLS_CACERTDIR')
-    AUTH_LDAP_TLS_CACERTFILE = config.get('ldap', 'AUTH_LDAP_TLS_CACERTFILE')
-    AUTH_LDAP_TLS_CERTFILE = config.get('ldap', 'AUTH_LDAP_TLS_CERTFILE')
-    AUTH_LDAP_TLS_KEYFILE = config.get('ldap', 'AUTH_LDAP_TLS_KEYFILE')
-    AUTH_LDAP_FIRSTNAME_FIELD = config.get('ldap', 'AUTH_LDAP_FIRSTNAME_FIELD')
-    AUTH_LDAP_LASTNAME_FIELD = config.get('ldap', 'AUTH_LDAP_LASTNAME_FIELD')
-    AUTH_LDAP_EMAIL_FIELD = config.get('ldap', 'AUTH_LDAP_EMAIL_FIELD')
-    AUTH_LDAP_BIND_FIRST = config.get('ldap', 'AUTH_LDAP_BIND_FIRST')
-elif AUTH_TYPE_STRING == 'AUTH_DB':
-    AUTH_TYPE = AUTH_DB
-else:
-    AUTH_TYPE = AUTH_DB
-    superset_logger = logging.getLogger("superset")
-    superset_logger.error('Incorrect configuration provided for authentication type(AUTH_TYPE)')
+AUTH_TYPE = AUTH_DB
+ldap_conf_path = os.path.join(DATA_DIR, 'ldap.conf')
+if os.path.exists(ldap_conf_path):
+    config = CP.ConfigParser()
+    config.optionxform = str
+    config.read(filenames=ldap_conf_path)
+    AUTH_TYPE_STRING = config.get('ldap', 'AUTH_TYPE')
+    if AUTH_TYPE_STRING == 'AUTH_LDAP':
+        AUTH_TYPE = AUTH_LDAP
+        AUTH_ROLE_PUBLIC = config.get('ldap', 'AUTH_ROLE_PUBLIC')
+        AUTH_USER_REGISTRATION = config.get('ldap', 'AUTH_USER_REGISTRATION')
+        AUTH_USER_REGISTRATION_ROLE = config.get('ldap', 'AUTH_USER_REGISTRATION_ROLE')
+        AUTH_LDAP_SERVER = config.get('ldap', 'AUTH_LDAP_SERVER')
+        AUTH_LDAP_BIND_USER = config.get('ldap', 'AUTH_LDAP_BIND_USER')
+        AUTH_LDAP_BIND_PASSWORD = config.get('ldap', 'AUTH_LDAP_BIND_PASSWORD')
+        AUTH_LDAP_SEARCH = config.get('ldap', 'AUTH_LDAP_SEARCH')
+        AUTH_LDAP_UID_FIELD = config.get('ldap', 'AUTH_LDAP_UID_FIELD')
+        AUTH_LDAP_ALLOW_SELF_SIGNED = config.get('ldap', 'AUTH_LDAP_ALLOW_SELF_SIGNED')
+        AUTH_LDAP_USE_TLS = config.get('ldap', 'AUTH_LDAP_USE_TLS')
+        AUTH_LDAP_TLS_DEMAND = config.get('ldap', 'AUTH_LDAP_TLS_DEMAND')
+        AUTH_ROLE_ADMIN = config.get('ldap', 'AUTH_ROLE_ADMIN')
+        AUTH_LDAP_SEARCH_FILTER = config.get('ldap', 'AUTH_LDAP_SEARCH_FILTER')
+        AUTH_LDAP_APPEND_DOMAIN = config.get('ldap', 'AUTH_LDAP_APPEND_DOMAIN')
+        AUTH_LDAP_USERNAME_FORMAT = config.get('ldap', 'AUTH_LDAP_USERNAME_FORMAT')
+        AUTH_LDAP_TLS_CACERTDIR = config.get('ldap', 'AUTH_LDAP_TLS_CACERTDIR')
+        AUTH_LDAP_TLS_CACERTFILE = config.get('ldap', 'AUTH_LDAP_TLS_CACERTFILE')
+        AUTH_LDAP_TLS_CERTFILE = config.get('ldap', 'AUTH_LDAP_TLS_CERTFILE')
+        AUTH_LDAP_TLS_KEYFILE = config.get('ldap', 'AUTH_LDAP_TLS_KEYFILE')
+        AUTH_LDAP_FIRSTNAME_FIELD = config.get('ldap', 'AUTH_LDAP_FIRSTNAME_FIELD')
+        AUTH_LDAP_LASTNAME_FIELD = config.get('ldap', 'AUTH_LDAP_LASTNAME_FIELD')
+        AUTH_LDAP_EMAIL_FIELD = config.get('ldap', 'AUTH_LDAP_EMAIL_FIELD')
+        AUTH_LDAP_BIND_FIRST = config.get('ldap', 'AUTH_LDAP_BIND_FIRST')
+    elif AUTH_TYPE_STRING == 'AUTH_DB':
+        AUTH_TYPE = AUTH_DB
+    else:
+        AUTH_TYPE = AUTH_DB
+        superset_logger = logging.getLogger("superset")
+        superset_logger.error('Incorrect configuration provided for authentication type(AUTH_TYPE)')
 
 # Uncomment to setup Full admin role name
 # AUTH_ROLE_ADMIN = 'Admin'
