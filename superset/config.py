@@ -138,7 +138,7 @@ DB_DATABASE = os.environ.get("DATABASE_DB", "superset")
 SQLALCHEMY_DATABASE_URI = f'{DB_DIALECT}://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_DATABASE}'  # pylint: disable=line-too-long
 # SQLALCHEMY_DATABASE_URI = 'postgresql://superset:superset@db/superset'
 
-# URL TO send request to workflow.
+# URL TO send request to workflow. SET this appropriately so not to break stuff.
 WORKFLOW_URI = os.environ.get("WORKFLOW_URI", "http://localhost:8080/")
 
 # In order to hook up a custom password store for all SQLACHEMY connections
