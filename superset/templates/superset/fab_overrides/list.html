@@ -31,16 +31,15 @@
               <div class="modal-text">
                 <ol class="list-group">
                   <li class="list-group-item">
-                    Click on the 
+                    1. Click on the 
                     <a href="#" class="btn btn-sm btn-primary" style="border-radius: 100%;">
                       <i class="fa fa-plus"></i>
                     </a>
                     on the top right corner to add a new database.
+                  <br>
+                  2. Click on <code>Select Tables for Exploratory Data Analysis</code>
                   </li>
                 </ol>
-                <li class="list-group-item">
-                  Click on <code>Explore tables of database</code>
-                </li>
               </div>
           </div>
           <div class="modal-footer">
@@ -58,7 +57,7 @@
   <a href="/superset/sqllab" class="btn btn-primary btn-sm btn-default" data-toggle="tooltip" rel="tooltip"
     title="{{_('Explore tables of database')}}">
       <i class="fa fa-line-chart"></i>
-      Explore tables of database
+      Select Tables for Exploratory Data Analysis
   </a>
   {% if request.args.get('edaHelp') == 'True' %}
   <script>

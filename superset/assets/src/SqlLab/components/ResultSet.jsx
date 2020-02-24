@@ -72,7 +72,7 @@ class AddToEDASourcesButton extends React.PureComponent {
     return (
       <Button 
         bsSize="sm"
-        bsStyle="danger"
+        bsStyle="success"
         className={this.props.className}
         onClick={() => this.addToEDASources()}
       >
