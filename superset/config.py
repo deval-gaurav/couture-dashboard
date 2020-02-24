@@ -30,6 +30,7 @@ from collections import OrderedDict
 from datetime import date
 from typing import Any, Callable, Dict, List, Optional
 
+import configparser as CP
 from celery.schedules import crontab
 from dateutil import tz
 from flask_appbuilder.security.manager import AUTH_DB, AUTH_LDAP
@@ -37,8 +38,6 @@ from flask_appbuilder.security.manager import AUTH_DB, AUTH_LDAP
 from superset.stats_logger import DummyStatsLogger
 from superset.utils.log import DBEventLogger
 from superset.utils.logging_configurator import DefaultLoggingConfigurator
-
-import configparser as CP
 
 # Realtime stats logger, a StatsD implementation exists
 STATS_LOGGER = DummyStatsLogger()
@@ -136,8 +135,11 @@ DB_PORT = os.environ.get("DATABASE_PORT", "5432")
 DB_DATABASE = os.environ.get("DATABASE_DB", "superset")
 
 # SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(DATA_DIR, "superset.db")
-SQLALCHEMY_DATABASE_URI = f'{DB_DIALECT}://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_DATABASE}'
+SQLALCHEMY_DATABASE_URI = f'{DB_DIALECT}://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_DATABASE}'  # pylint: disable=line-too-long
 # SQLALCHEMY_DATABASE_URI = 'postgresql://superset:superset@db/superset'
+
+# URL TO send request to workflow.
+WORKFLOW_URI = os.environ.get("WORKFLOW_URI", "http://localhost:8080/")
 
 # In order to hook up a custom password store for all SQLACHEMY connections
 # implement a function that takes a single argument of type 'sqla.engine.url',

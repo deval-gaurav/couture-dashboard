@@ -17,8 +17,59 @@
   under the License.
 #}
 {% extends 'appbuilder/general/widgets/list.html' %}
-
 {% block begin_content scoped %}
+  <div class="modal fade" id="modal-eda-help" tabindex="-1" role="dialog">
+    <!-- Help modal for EDA. shown when edaHelp=True -->
+    <div class="modal-dialog modal-md">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h4 class="modal-title" id="myModalLabel">
+              Exploratory Data Analysis.
+              </h4>
+          </div>
+          <div class="modal-body">
+              <div class="modal-text">
+                <ol class="list-group">
+                  <li class="list-group-item">
+                    Click on the 
+                    <a href="#" class="btn btn-sm btn-primary" style="border-radius: 100%;">
+                      <i class="fa fa-plus"></i>
+                    </a>
+                    on the top right corner to add a new database.
+                  </li>
+                </ol>
+                <li class="list-group-item">
+                  Click on <code>Explore tables of database</code>
+                </li>
+              </div>
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+          </div>
+      </div>
+    </div>
+  </div>
     <div class="table-responsive">
     <table class="table table-hover">
+{% endblock %}
+
+{% block end_content scoped %}
+  {{ super() }}
+  <a href="/superset/sqllab" class="btn btn-primary btn-sm btn-default" data-toggle="tooltip" rel="tooltip"
+    title="{{_('Explore tables of database')}}">
+      <i class="fa fa-line-chart"></i>
+      Explore tables of database
+  </a>
+  {% if request.args.get('edaHelp') == 'True' %}
+  <script>
+    $(document).ready(function() {
+      $('#modal-eda-help').modal();
+    })
+  </script>
+  {% endif %}
+  <!-- <script>
+    function redirectToSQLLab() {
+      window.location.href = '/superset/sqllab/'
+    }
+  </script> -->
 {% endblock %}

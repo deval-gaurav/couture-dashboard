@@ -56,6 +56,32 @@ const SEARCH_HEIGHT = 46;
 
 const LOADING_STYLES = { position: 'relative', minHeight: 100 };
 
+
+class AddToEDASourcesButton extends React.PureComponent {
+  constructor(props) {
+    super(props);
+  }
+
+  addToEDASources() {
+    // console.log(this.props.query)
+    // HACK
+    window.location.href = `/edasource/add/?db=${this.props.query.dbId}&tablename=${this.props.query.tableName}`
+  }
+
+  render() {
+    return (
+      <Button 
+        bsSize="sm"
+        bsStyle="danger"
+        className={this.props.className}
+        onClick={() => this.addToEDASources()}
+      >
+        <i className="fa fa-line-chart" /> {t(`Add table to EDA sources`)}
+      </Button>
+    );
+  }
+}
+
 export default class ResultSet extends React.PureComponent {
   constructor(props) {
     super(props);
@@ -166,6 +192,8 @@ export default class ResultSet extends React.PureComponent {
                   }
                 />
               </ButtonGroup>
+                &emsp;
+                <AddToEDASourcesButton query={this.props.query}/>
             </div>
             <div className="pull-right">
               {this.props.search && (
@@ -254,17 +282,22 @@ export default class ResultSet extends React.PureComponent {
     }
     if (query.cached || (query.state === 'success' && !query.results)) {
       return (
-        <Button
-          bsSize="sm"
-          className="fetch"
-          bsStyle="primary"
-          onClick={this.reFetchQueryResults.bind(this, {
-            ...query,
-            isDataPreview: true,
-          })}
-        >
-          {t('Fetch data preview')}
-        </Button>
+        <div>
+          <Button
+            bsSize="sm"
+            className="fetch"
+            bsStyle="primary"
+            onClick={this.reFetchQueryResults.bind(this, {
+              ...query,
+              isDataPreview: true,
+            })}
+          >
+            {t('Fetch data preview')}
+          </Button>
+          &emsp;
+          <AddToEDASourcesButton query={this.props.query} className="fetch"/>
+        </div>
+        // </ButtonGroup>
       );
     }
     let progressBar;
@@ -303,6 +336,9 @@ export default class ResultSet extends React.PureComponent {
         </div>
         <div>{progressBar}</div>
         <div>{trackingUrl}</div>
+        <div>
+          <AddToEDASourcesButton query={this.props.query} className="fetch"/>
+        </div>
       </div>
     );
   }

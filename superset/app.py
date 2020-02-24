@@ -164,6 +164,7 @@ class SupersetAppInitializer:
             DatabaseTablesAsync,
             CsvToDatabaseView,
             DatabaseAsync,
+            EDASource
         )
         from superset.views.datasource import Datasource
         from superset.views.log.api import LogRestApi
@@ -264,7 +265,7 @@ class SupersetAppInitializer:
         appbuilder.add_view_no_menu(DatabaseAsync)
         appbuilder.add_view_no_menu(DatabaseTablesAsync)
         appbuilder.add_view_no_menu(Datasource)
-        appbuilder.add_view_no_menu(KV)
+        appbuilder.add_view_no_menu(EDASource)
         appbuilder.add_view_no_menu(R)
         appbuilder.add_view_no_menu(SavedQueryView)
         appbuilder.add_view_no_menu(SavedQueryViewApi)

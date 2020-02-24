@@ -15,9 +15,11 @@
 # specific language governing permissions and limitations
 # under the License.
 import os
+import urllib.parse
+import requests
 
-from flask import flash, g, redirect
-from flask_appbuilder import SimpleFormView
+from flask import flash, g, redirect, request, url_for
+from flask_appbuilder import SimpleFormView, expose, has_access
 from flask_appbuilder.models.sqla.interface import SQLAInterface
 from flask_babel import lazy_gettext as _
 from werkzeug.utils import secure_filename
@@ -26,9 +28,15 @@ from wtforms.validators import ValidationError
 
 import superset.models.core as models
 from superset import app, db
+from superset.models.core import Database
+from superset.config import WORKFLOW_URI
 from superset.connectors.sqla.models import SqlaTable
 from superset.utils import core as utils
-from superset.views.base import DeleteMixin, SupersetModelView, YamlExportMixin
+from superset.views.base import (DeleteMixin,
+                                 SupersetModelView,
+                                 YamlExportMixin,
+                                 BaseSupersetView
+                                )
 
 from .forms import CsvToDatabaseForm
 from .mixins import DatabaseMixin
@@ -58,6 +66,42 @@ class DatabaseView(
 
     def _delete(self, pk):
         DeleteMixin._delete(self, pk)
+
+
+class EDASource(BaseSupersetView):
+
+    req_session = requests.sessions.Session()
+
+
+    def get_db_conn_uri(self, id_):
+        sess = db.session()
+        return sess.query(Database).filter(
+            Database.id == id_).first().sqlalchemy_uri_decrypted
+
+
+    @expose("/add/", methods=['POST', 'GET'])
+    @has_access
+    def eda_source(self):
+        """
+        Allows to add database table as source for Exploratory Data Analysis.
+        """
+        tablename = request.args.get('tablename')
+        conn_uri = self.get_db_conn_uri(int(request.args.get('db')))
+
+        # Add these connection URI's to Workflow, then redirect to workflow.
+        res = self.req_session.post(
+                urllib.parse.urljoin(WORKFLOW_URI, 'eda/api/'),
+                data={
+                    'connection_uri': conn_uri,
+                    'source_type': 'db',
+                    'tablename': tablename
+                })
+        if res.status_code != 201:
+            flash('Internal Error while adding as EDA source.')
+            return redirect('/superset/sqllab')
+
+        # TODO: Think of how we can keep track of workflow EDA endpoint in superset.
+        return redirect(urllib.parse.urljoin(WORKFLOW_URI, 'eda/sources/'))
 
 
 class CsvToDatabaseView(SimpleFormView):
