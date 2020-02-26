@@ -26,10 +26,6 @@ RUN mkdir /app \
         && apt-get install -y --no-install-recommends \
             build-essential \
             default-libmysqlclient-dev \
-            libsasl2-dev \
-            python-dev \
-            libldap2-dev \
-            libssl-dev\
             libpq-dev \
         && rm -rf /var/lib/apt/lists/*
 
@@ -79,12 +75,7 @@ RUN useradd --user-group --no-create-home --no-log-init --shell /bin/bash supers
         && apt-get install -y --no-install-recommends \
             build-essential \
             default-libmysqlclient-dev \
-            libsasl2-dev \
-            python-dev \
-            libldap2-dev \
-            libssl-dev\
             libpq-dev \
-            default-mysql-client \
         && rm -rf /var/lib/apt/lists/*
 
 COPY --from=superset-py /usr/local/lib/python3.6/site-packages/ /usr/local/lib/python3.6/site-packages/
@@ -100,7 +91,7 @@ RUN cd /app \
         && pip install -e .
 
 COPY ./docker/docker-entrypoint.sh /usr/bin/
-COPY ./docker/docker-init.sh /app/
+
 WORKDIR /app
 
 USER superset
