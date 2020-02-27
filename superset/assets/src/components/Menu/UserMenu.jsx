@@ -51,10 +51,6 @@ export default function UserMenu({
         <span className="fa fa-fw fa-sign-out" />
         {t('Logout')}
       </MenuItem>
-      <MenuItem href="http://54.209.50.67:8080">
-        <span className="fa fa-fw fa-link" />
-        {t('Back to workflow')}
-      </MenuItem>
       {(versionString || versionSha) && (
         <li className="version-info">
           {versionString && <div>Version: {versionString}</div>}

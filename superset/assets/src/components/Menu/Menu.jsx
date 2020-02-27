@@ -50,6 +50,11 @@ const propTypes = {
   }).isRequired,
 };
 
+function get_workflow_path() {
+  // TODO: REMOVE HARDCODING REDIRECT PATHS.
+  return "http://" + window.location.hostname + ":8080"
+}
+
 export default function Menu({
   data: { menu, brand, navbar_right: navbarRight },
 }) {
@@ -58,7 +63,7 @@ export default function Menu({
       <Navbar inverse fluid staticTop role="navigation">
         <Navbar.Header>
           <Navbar.Brand>
-            <a className="navbar-brand" href={brand.path}>
+            <a className="navbar-brand" href={get_workflow_path}>
               <img width="126" src={brand.icon} alt={brand.alt} />
             </a>
           </Navbar.Brand>
