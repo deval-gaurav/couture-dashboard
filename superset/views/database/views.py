@@ -29,7 +29,7 @@ from wtforms.validators import ValidationError
 import superset.models.core as models
 from superset import app, db
 from superset.models.core import Database
-from superset.config import WORKFLOW_URI
+from superset.config import WORKFLOW_URI, WORKFLOW_REDIRECT_URI
 from superset.connectors.sqla.models import SqlaTable
 from superset.utils import core as utils
 from superset.views.base import (DeleteMixin,
@@ -101,7 +101,7 @@ class EDASource(BaseSupersetView):
             return redirect('/superset/sqllab')
 
         # TODO: Think of how we can keep track of workflow EDA endpoint in superset.
-        return redirect(urllib.parse.urljoin(WORKFLOW_URI, 'eda/sources/'))
+        return redirect(urllib.parse.urljoin(WORKFLOW_REDIRECT_URI, 'eda/sources/'))
 
 
 class CsvToDatabaseView(SimpleFormView):
