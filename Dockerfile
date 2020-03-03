@@ -28,6 +28,7 @@ RUN mkdir /app \
             default-libmysqlclient-dev \
             libsasl2-dev \
             python-dev \
+            python3-dev \
             libldap2-dev \
             libssl-dev\
             libpq-dev \
@@ -81,6 +82,7 @@ RUN useradd --user-group --no-create-home --no-log-init --shell /bin/bash supers
             default-libmysqlclient-dev \
             libsasl2-dev \
             python-dev \
+            python3-dev \
             libldap2-dev \
             libssl-dev\
             libpq-dev \
