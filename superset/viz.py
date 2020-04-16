@@ -20,6 +20,7 @@
 These objects represent the backend of all the visualizations that
 Superset can render.
 """
+import pprint
 import copy
 import hashlib
 import inspect
@@ -1713,6 +1714,68 @@ class SankeyViz(BaseViz):
         df["source"] = df["source"].astype(str)
         df["target"] = df["target"].astype(str)
         recs = df.to_dict(orient="records")
+
+        hierarchy: Dict[str, Set[str]] = defaultdict(set)
+        for row in recs:
+            hierarchy[row["source"]].add(row["target"])
+
+        def find_cycle(g):
+            """Whether there's a cycle in a directed graph"""
+            path = set()
+
+            def visit(vertex):
+                path.add(vertex)
+                for neighbour in g.get(vertex, ()):
+                    if neighbour in path or visit(neighbour):
+                        return (vertex, neighbour)
+                path.remove(vertex)
+
+            for v in g:
+                cycle = visit(v)
+                if cycle:
+                    return cycle
+
+        cycle = find_cycle(hierarchy)
+        if cycle:
+            raise Exception(
+                _(
+                    "There's a loop in your Sankey, please provide a tree. "
+                    "Here's a faulty link: {}"
+                ).format(cycle)
+            )
+        return recs
+
+
+class CoutureSankeyViz(BaseViz):
+
+    """A Sankey diagram that requires a parent-child dataset"""
+
+    viz_type = "couture_sankey"
+    verbose_name = _("Couture Sankey")
+    is_timeseries = False
+    credits = '<a href="https://www.npmjs.com/package/d3-sankey">d3-sankey on npm</a>'
+
+    def query_obj(self):
+        qry = super().query_obj()
+        if len(qry["groupby"]) < 2:
+            raise Exception(_("Pick more than 2 columns as [Source & Target]"))
+        qry["metrics"] = [self.form_data["canBeEmptyMetric"]] if self.form_data.get("canBeEmptyMetric") else []
+        qry['groupby'] = self.form_data["groupby"]
+        return qry
+
+    def get_data(self, df: pd.DataFrame) -> VizData:
+        qry = self.query_obj()
+        data = pd.DataFrame(columns=['source', 'target', 'value'])
+        # print("griiii", self.form_data["groupby"])
+        for col_no in range(0, len(self.form_data["groupby"])-1, 1):
+            temp = pd.DataFrame({'value': df.groupby([self.form_data["groupby"][col_no], self.form_data["groupby"][col_no + 1]]).size()}).reset_index()
+            temp.columns = ['source', 'target', 'value']
+            data = data.append(temp)
+
+        data["source"] = data["source"].astype(str)
+        data["target"] = data["target"].astype(str)
+        recs = data.to_dict(orient="records")
+        # pprint.pprint(recs)
 
         hierarchy: Dict[str, Set[str]] = defaultdict(set)
         for row in recs:

@@ -188,9 +188,19 @@ const metrics = {
   },
   description: t('One or many metrics to display'),
 };
+
 const metric = {
   ...metrics,
   multi: false,
+  label: t('Metric'),
+  description: t('Metric'),
+  default: props => mainMetric(props.savedMetrics),
+};
+
+const canBeEmptyMetric = {
+  ...metrics,
+  multi: false,
+  validators: [],
   label: t('Metric'),
   description: t('Metric'),
   default: props => mainMetric(props.savedMetrics),
@@ -256,6 +266,7 @@ export const controls = {
   metrics,
 
   metric,
+  canBeEmptyMetric,
 
   datasource: {
     type: 'DatasourceControl',
@@ -572,15 +583,20 @@ export const controls = {
       let choices = [];
       if (state.controls && state.datasource) {
         const gbSet = new Set((state.controls.groupby || {}).value || []);
+        const gSelectables = state.datasource.columns.filter(elem => gbSet.has(elem.column_name) && numTypes.has(elem.type));
         const mSelectables = state.controls.metrics.value.map(elem => {
           return { column_name: elem.label}; 
         }) || [];
-
-        const cSelectables = state.datasource.columns.filter(elem => gbSet.has(elem.column_name) && numTypes.has(elem.type));
-        choices = [...mSelectables, ...cSelectables];
+        const cSet = new Set((state.controls.all_columns || {}).value || []);
+        const cSelectables = state.datasource.columns.filter(elem => cSet.has(elem.column_name) && numTypes.has(elem.type));
+        choices = [...gSelectables, ...mSelectables, ...cSelectables];
+        // console.log("Yadadadad", cSet)
       } else {
         const formValue = (state.form_data || {}).columns_and_metrics_x || [];
-        choices = [[formValue, formValue]];
+        // choices = [[formValue, formValue]];
+        return ({
+          value: (state.form_data || {}).columns_and_metrics_x || null
+        })
       }
       return {
         choices: columnChoices({ columns: choices})
@@ -594,22 +610,32 @@ export const controls = {
     label: t('Y Axis'),
     default: [],
     description: t('Columns or metrics to display'),
-    mapStateToProps: (state) => {
+    mapStateToProps: (state, control) => {
       let choices = [];
+      // console.log("AAAAAAA", state.controls, control);
+      // console.log(state.form_data);
       if (state.controls && state.datasource) {
         const gbSet = new Set((state.controls.groupby || {}).value || []);
+        const gSelectables = state.datasource.columns.filter(elem => gbSet.has(elem.column_name) && numTypes.has(elem.type));
         const mSelectables = state.controls.metrics.value.map(elem => {
           return { column_name: elem.label}; 
         }) || [];
-        const cSelectables = state.datasource.columns.filter(elem => gbSet.has(elem.column_name) && numTypes.has(elem.type));
-        choices = [...mSelectables, ...cSelectables];
+        const cSet = new Set((state.controls.all_columns || {}).value || []);
+        const cSelectables = state.datasource.columns.filter(elem => cSet.has(elem.column_name) && numTypes.has(elem.type));
+        choices = [...gSelectables, ...mSelectables, ...cSelectables];
       } else {
-        const formValue = (state.form_data || {}).columns_and_metrics_x || [];
-        choices = [[formValue, formValue]];
+        const formValue = (state.form_data || {}).columns_and_metrics_y || [];
+        // console.log("bbbbbbbb", formValue, state.form_data.columns_and_metrics_y, (state.form_data || {}).columns_and_metrics_y || []);
+        return ({
+          value: (state.form_data || {}).columns_and_metrics_y || []
+        })
+        // choices = [[formValue, formValue]];
       }
-      return {
-        choices: columnChoices({ columns: choices})
-      };
+      // console.log(        state.controls.columns_and_metrics_y.value        )
+      return ({
+        choices: columnChoices({ columns: choices}),
+        // value: state.controls.columns_and_metrics_y.value
+      });
     },
   },
 
