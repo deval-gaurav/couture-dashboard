@@ -573,6 +573,15 @@ export const controls = {
     description: t('Show the value on top of the bar'),
   },
 
+  metrics_linexy: {
+    ...metrics,
+    description: t(
+      'One or many metrics to display.' + 
+      'Make sure metrics are all numerical.' + 
+      'Use custom sql to select raw columns.'
+    )
+  },
+
   columns_and_metrics_x: {
     type: 'SelectControl',
     label: t('X Axis'),
@@ -584,16 +593,19 @@ export const controls = {
       if (state.controls && state.datasource) {
         const gbSet = new Set((state.controls.groupby || {}).value || []);
         const gSelectables = state.datasource.columns.filter(elem => gbSet.has(elem.column_name) && numTypes.has(elem.type));
-        const mSelectables = state.controls.metrics.value.map(elem => {
+        
+        // all metrics are selectable.
+        const mSet = state.controls.metrics_linexy.value.filter(elem => elem.label)
+        const mSelectables = mSet.map(elem => {
+          console.log("mselectable", elem);
           return { column_name: elem.label}; 
         }) || [];
+
         const cSet = new Set((state.controls.all_columns || {}).value || []);
         const cSelectables = state.datasource.columns.filter(elem => cSet.has(elem.column_name) && numTypes.has(elem.type));
         choices = [...gSelectables, ...mSelectables, ...cSelectables];
-        // console.log("Yadadadad", cSet)
       } else {
         const formValue = (state.form_data || {}).columns_and_metrics_x || [];
-        // choices = [[formValue, formValue]];
         return ({
           value: (state.form_data || {}).columns_and_metrics_x || null
         })
@@ -617,7 +629,10 @@ export const controls = {
       if (state.controls && state.datasource) {
         const gbSet = new Set((state.controls.groupby || {}).value || []);
         const gSelectables = state.datasource.columns.filter(elem => gbSet.has(elem.column_name) && numTypes.has(elem.type));
-        const mSelectables = state.controls.metrics.value.map(elem => {
+        // all metrics are selectable.
+        const mSet = state.controls.metrics_linexy.value.filter(elem => elem.label)
+        const mSelectables = mSet.map(elem => {
+          console.log("mselectable", elem);
           return { column_name: elem.label}; 
         }) || [];
         const cSet = new Set((state.controls.all_columns || {}).value || []);

@@ -1094,13 +1094,16 @@ class NVD3LineXYViz(NVD3Viz):
     def query_obj(self):
         d = super(NVD3LineXYViz, self).query_obj()
         fd = self.form_data
-        if fd.get('all_columns') and (fd.get('groupby') or fd.get('metrics')):
+        if fd.get('all_columns') and (fd.get('groupby') or fd.get('metrics_linexy')):
             raise Exception(_(
                 'Choose either fields to [Group By] and [Metrics] or '
                 '[Columns], not both'))
 
         x_field = fd.get('columns_and_metrics_x')
         y_fields = fd.get('columns_and_metrics_y')
+
+        if fd.get('metrics_linexy'):
+            d['metrics'] = fd.get('metrics_linexy')
 
         if x_field and y_fields:
             if fd.get('all_columns'):

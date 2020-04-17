@@ -27,7 +27,7 @@ export default {
       description: t('Use this section if you want a query that aggregates'),
       controlSetRows: [
         ['groupby'],
-        ['metrics'],
+        ['metrics_linexy'],
       ],
     },
     {
