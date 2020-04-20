@@ -125,18 +125,37 @@ const sortAxisChoices = [
   ['value_desc', 'sum(value) descending'],
 ];
 
-const numTypes = new Set([
-  "DOUBLE",
-  "FLOAT",
-  "INT",
-  "BIGINT",
-  "NUMBER",
-  "LONG",
-  "REAL",
-  "NUMERIC",
-  "DECIMAL",
-  "MONEY",
-]);
+var numTypes = {
+  prefixes: [
+    "DOUBLE",
+    "FLOAT",
+    "INT",
+    "BIGINT",
+    "NUMBER",
+    "LONG",
+    "REAL",
+    "NUMERIC",
+    "DECIMAL",
+    "MONEY",
+  ],
+  has: function(elem) {
+    try {
+      for(let i=0; i<this.prefixes.length; i++) {
+        if(elem.startsWith(this.prefixes[i])) {
+          return true;
+        }
+      }
+      return false;
+    } 
+    // to catch exceptions when elem not a string.
+    catch (e) {
+      console.log(e)
+      return false;
+    }
+    
+  }
+}
+
 
 const groupByControl = {
   type: 'SelectControl',
@@ -597,7 +616,6 @@ export const controls = {
         // all metrics are selectable.
         const mSet = state.controls.metrics_linexy.value.filter(elem => elem.label)
         const mSelectables = mSet.map(elem => {
-          console.log("mselectable", elem);
           return { column_name: elem.label}; 
         }) || [];
 
@@ -616,6 +634,7 @@ export const controls = {
     },
   },
 
+  // TODO: Make columns_and_metrics_y, columns_and_metrics_x DRY.
   columns_and_metrics_y: {
     type: 'SelectControl',
     multi: true,
@@ -624,8 +643,6 @@ export const controls = {
     description: t('Columns or metrics to display'),
     mapStateToProps: (state, control) => {
       let choices = [];
-      // console.log("AAAAAAA", state.controls, control);
-      // console.log(state.form_data);
       if (state.controls && state.datasource) {
         const gbSet = new Set((state.controls.groupby || {}).value || []);
         const gSelectables = state.datasource.columns.filter(elem => gbSet.has(elem.column_name) && numTypes.has(elem.type));
@@ -640,16 +657,12 @@ export const controls = {
         choices = [...gSelectables, ...mSelectables, ...cSelectables];
       } else {
         const formValue = (state.form_data || {}).columns_and_metrics_y || [];
-        // console.log("bbbbbbbb", formValue, state.form_data.columns_and_metrics_y, (state.form_data || {}).columns_and_metrics_y || []);
         return ({
           value: (state.form_data || {}).columns_and_metrics_y || []
         })
-        // choices = [[formValue, formValue]];
       }
-      // console.log(        state.controls.columns_and_metrics_y.value        )
       return ({
         choices: columnChoices({ columns: choices}),
-        // value: state.controls.columns_and_metrics_y.value
       });
     },
   },
