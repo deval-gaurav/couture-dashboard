@@ -85,19 +85,23 @@ class EDASource(BaseSupersetView):
         """
         Allows to add database table as source for Exploratory Data Analysis.
         """
-        tablename = request.args.get('tablename')
-        conn_uri = self.get_db_conn_uri(int(request.args.get('db')))
+        try:
+            tablename = request.args.get('tablename')
+            conn_uri = self.get_db_conn_uri(int(request.args.get('db')))
 
-        # Add these connection URI's to Workflow, then redirect to workflow.
-        res = self.req_session.post(
-                urllib.parse.urljoin(WORKFLOW_URI, 'eda/api/'),
-                data={
-                    'connection_uri': conn_uri,
-                    'source_type': 'db',
-                    'tablename': tablename
-                })
-        if res.status_code != 201:
-            flash('Internal Error while adding as EDA source.')
+            # Add these connection URI's to Workflow, then redirect to workflow.
+            res = self.req_session.post(
+                    urllib.parse.urljoin(WORKFLOW_URI, 'eda/api/'),
+                    data={
+                        'connection_uri': conn_uri,
+                        'source_type': 'db',
+                        'tablename': tablename
+                    })
+            if res.status_code != 201:
+                flash('Internal Error while adding as EDA source.')
+                return redirect('/superset/sqllab')
+        except requests.exceptions.ConnectionError:
+            flash('Cannot connect to Workflow while adding a EDA source.')
             return redirect('/superset/sqllab')
 
         # TODO: Think of how we can keep track of workflow EDA endpoint in superset.
