@@ -87,7 +87,7 @@ export default {
     },
   ],
   controlOverrides: {
-    metrics: {
+    metrics_linexy: {
       validators: [],
     },
     time_grain_sqla: {
