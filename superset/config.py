@@ -51,6 +51,9 @@ if "SUPERSET_HOME" in os.environ:
 else:
     DATA_DIR = os.path.join(os.path.expanduser("~"), ".superset")
 
+# Directory containing airflow configs
+CONF_DIR = os.environ.get("CONF_DIR", "/app/configs/")
+
 # ---------------------------------------------------------
 # Superset specific config
 # ---------------------------------------------------------
@@ -219,7 +222,7 @@ DRUID_IS_ACTIVE = False
 # AUTH_LDAP : Is for LDAP
 # AUTH_REMOTE_USER : Is for using REMOTE_USER from web server
 AUTH_TYPE = AUTH_DB
-ldap_conf_path = os.path.join(DATA_DIR, 'ldap.conf')
+ldap_conf_path = os.path.join(CONF_DIR, 'ldap.conf')
 if os.path.exists(ldap_conf_path):
     config = CP.ConfigParser()
     config.optionxform = str
