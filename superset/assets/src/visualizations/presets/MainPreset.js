@@ -68,6 +68,7 @@ import FilterBoxChartPlugin from '../FilterBox/FilterBoxChartPlugin';
 import TimeTableChartPlugin from '../TimeTable/TimeTableChartPlugin';
 import LineXYChartPlugin from '../LineXY/LineXYChartPlugin';
 import CoutureSankeyChartPlugin from '../CoutureSankey/CoutureSankey';
+import VariableScaleBarChart from '../VariableScaleBarChart/index.js';
 
 export default class MainPreset extends Preset {
   constructor() {
@@ -116,6 +117,7 @@ export default class MainPreset extends Preset {
         new TreemapChartPlugin().configure({ key: 'treemap' }),
         new WordCloudChartPlugin().configure({ key: 'word_cloud' }),
         new WorldMapChartPlugin().configure({ key: 'world_map' }),
+        new VariableScaleBarChart().configure({ key: 'var_scale' }),
       ],
     });
   }
