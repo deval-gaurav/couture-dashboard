@@ -274,9 +274,12 @@ Storybook serber is started on PORT 9001. Now the changes made to the plugins ca
 - Run the dev-server to see the changes.
 
 ***
-## **VariableScaleBarChart.js file with explanatory comments(equivalent to Chart.js file as explanation above)**
-
+## **A simplified example of a visualization file with explainatory comments : [VariableScaleBarChart.js](./superset/assets/src/visualizations/VariableScaleBarChart/VariableScaleBarChart.js)**
+![VariableScaleBarChart thumbnail](./superset/assets/src/visualizations/VariableScaleBarChart/images/thumbnail.png)
 ```javascript
+// This file doesn't include code for some extra featres like XTicksLayout, barValueLayout, option to display Legend etc.
+// To see the original file go to the link provided in the Heading above
+
 import d3 from 'd3';                  // D3 version3 is imported by default
 import PropTypes from 'prop-types';
 import './styles.css';                // link to css file
@@ -302,7 +305,7 @@ const propTypes = {
 const TIME_SHIFT_PATTERN = /\d+ \w+ offset/;
 const { getColor } = CategoricalColorNamespace;
 
-// used to identify the categorical coloue scheme
+// used to identify the categorical color scheme
 function cleanColorInput(value) {
     // for superset series that should have the same color
     return String(value)
@@ -340,8 +343,8 @@ function VariableScale(element,props){
         yScale,
         yAxis,
         entries = 0,
-        rAngle,
-        bAngle;
+        rAngle = 0,
+        bAngle = 0;
 
     let color = ["#e8a92c","#6e63c2","#f0ec1d","#950cad","#3bbad4","#38f2ff","#d1ce0d"];
     // the colorScale according to the colorScheme chosen
@@ -401,13 +404,13 @@ function VariableScale(element,props){
 
         // appending Axes
         for(let m = 0 ; m < metrics.length ; m++ ){
-            yScale = d3.scale.linear().domain([0,dMax[m]]).range([innerheight,0]);
+            yScale = d3.scale.linear().domain([0,dMax[m]]).range([innerheight,0]); // defining scale for mth metric
             LinearScale.push(yScale);
             yAxis = d3.svg.axis().scale(yScale).orient('left')
                           .tickPadding(4).ticks(10).tickSize(5)
                           .tickFormat(dMax[m] < 10 ? d3.format("") : d3.format(".2s") );
 
-            let axisG = GraphG.append('g')
+            let axisG = GraphG.append('g')      // container for mth y-axis
                             .classed('my-axis',true)
                             .attr('id',`axis${m}`);
 
@@ -418,7 +421,7 @@ function VariableScale(element,props){
                 .style("stroke-width",2.75)
                 .style('fill','none');
             
-            // Append Y Axis Labels for each y-axis
+            // Append Y Axis Labels for mth y-axis
             axisG.append('text')
             .text(`${metrics[m].toUpperCase()}`)
             .attr('fill','#777777')
@@ -434,27 +437,27 @@ function VariableScale(element,props){
         d3.selectAll("rect").remove();  // befor re-rendering delete all existing Bars
 
         for(let j = 0 ; j < metrics.length ; j++ ){
-            svg.append("g").selectAll("rect").data(data1).enter().append("rect")
-            .style("fill", colorScale(metrics[j]) || color[j])
+            svg.append("g").selectAll("rect").data(data1).enter().append("rect") // bars of each metric(same color) in seperate <g> tag 
+            .style("fill", colorScale(metrics[j]) || color[j])     // use the colorScheme from props if available or use default colors
             .attr("x",(d,i) => axisWidth+(barWidth)*j+(entryWidth*i) )
             .attr("width",barWidth)
-            .attr("y",(d) => margin.top + LinearScale[j](d[metrics[j]]) )
-            .attr("height",(d) => innerheight - LinearScale[j](d[metrics[j]]));
+            .attr("y",(d) => margin.top + LinearScale[j](d[metrics[j]]) )       // y coordinate of top of each bar 
+            .attr("height",(d) => innerheight - LinearScale[j](d[metrics[j]])); // height extends downwards from (x,y) point
         }
 
-        // Appending X Axes labels
+        // Appending X-Axis Ticks
         svg.append("g").selectAll("text").data(data1)
             .enter().append("text")
             .classed("x-label",true)
             .text((d,i) => d[series])
-            .attr("y",(d,i) => innerheight + margin.top + 18 + ((xTicksLayout === "staggered") ? (i%2)*12 : 0 ))
+            .attr("y",(d,i) => innerheight + margin.top + 18 )
             .attr("x",(d,i) => axisWidth + entryWidth*i + entryWidth*4/9)
             .style("fill","#555555")
             .attr("text-anchor",xTicksLayout === "45°" ? "start" : "middle")
-            .attr("transform",(d,i) => `rotate(${rAngle},${axisWidth + entryWidth*i},${innerheight + margin.top})`);
+            .attr("transform",(d,i) => `rotate(${rAngle},${axisWidth + entryWidth*i},${innerheight + margin.top})`); // rotates tick by rAngle degrees
 
         // Adding X axis label if true
-        if(xAxisLabel !== ""){
+        if(xAxisLabel !== ""){    // If X axis Label is not empty string
             svg.append("g").append("text")
                 .text(xAxisLabel)
                 .attr("text-anchor","middle")
