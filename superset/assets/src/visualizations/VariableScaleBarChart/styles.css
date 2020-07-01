@@ -1,0 +1,28 @@
+#my-svg{
+    width: 97%;
+    height: 88%;
+    margin: 10px 10px 10px 10px;
+}
+
+.tick line{
+    stroke: #00000095;
+}
+
+
+.tick text{
+    font-size: 0.75rem;
+    font-weight: 200;
+    stroke: #00000040;
+}
+
+.right-axis .tick line{
+    stroke: #00000025;
+}
+
+#axis-1 g text{
+    font-size: 0;
+}
+
+.x-label{
+    font-size: 0.7rem;
+}

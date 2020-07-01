@@ -2041,6 +2041,24 @@ class ParallelCoordinatesViz(BaseViz):
         return df.to_dict(orient="records")
 
 
+class VariableScaleBarChartViz(BaseViz):
+
+    """Variable Scale Bar Chart"""
+
+    viz_type = "var_scale"
+    verbose_name = _("Variable Scale BarChart")
+    is_timeseries = False
+
+    def query_obj(self):
+        d = super().query_obj()
+        fd = self.form_data
+        d["groupby"] = [fd.get("series")]
+        return d
+
+    def get_data(self, df: pd.DataFrame) -> VizData:
+        return df.to_dict(orient="records")
+
+
 class HeatmapViz(BaseViz):
 
     """A nice heatmap visualization that support high density through canvas"""
