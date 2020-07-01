@@ -2049,7 +2049,7 @@ class VariableScaleBarChartViz(BaseViz):
     verbose_name = _("Variable Scale BarChart")
     is_timeseries = False
 
-    def query_obj(self) -> QueryObjectDict:
+    def query_obj(self):
         d = super().query_obj()
         fd = self.form_data
         d["groupby"] = [fd.get("series")]
