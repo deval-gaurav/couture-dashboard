@@ -361,7 +361,7 @@ TIME_GRAIN_ADDON_FUNCTIONS: Dict[str, Dict[str, str]] = {}
 
 
 
-:
+
 #  VIZ_TYPE_BLACKLIST = ['pivot_table', 'treemap']
 # ---------------------------------------------------
 
@@ -433,7 +433,7 @@ SQL_MAX_ROW = 100000
 # Maximum number of rows displayed in SQL Lab UI
 # Is set to avoid out of memory/localstorage issues in browsers. Does not affect
 # exported CSVs
-DISPLAY_MAX_ROW = 10000
+DISPLA Y_MAX_ROW = 10000
 
 # Default row limit for SQL Lab queries. Is overridden by setting a new limit in
 # the SQL Lab UI
@@ -491,7 +491,7 @@ CELERY_CONFIG = CeleryConfig  # pylint: disable=invalid-name
 # DEFAULT_HTTP_HEADERS: sets default values for HTTP headers. These may be overridden
 # within the app
 # OVERRIDE_HTTP_HEADERS: sets override values for HTTP headers. These values will
-# override anything set within the app
+# over ride anything set within the app
 DEFAULT_HTTP_HEADERS: Dict[str, Any] = {}
 OVERRIDE_HTTP_HEADERS: Dict[str, Any] = {}
 HTTP_HEADERS: Dict[str, Any] = {}
